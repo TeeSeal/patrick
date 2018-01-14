@@ -230,9 +230,9 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
-bootbot@^1.0.14:
+"bootbot@github:teeseal/bootbot#master":
   version "1.0.14"
-  resolved "https://registry.yarnpkg.com/bootbot/-/bootbot-1.0.14.tgz#15646937a2678869303969c55b7b1e801decf66d"
+  resolved "https://codeload.github.com/teeseal/bootbot/tar.gz/4d964dfb608c3c50afd6bb242d95217302e3a141"
   dependencies:
     body-parser "^1.15.2"
     config "^1.21.0"

@@ -10,7 +10,7 @@
   "author": "TeeSeal <teesealz@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "bootbot": "^1.0.14"
+    "bootbot": "github:teeseal/bootbot#master"
   },
   "devDependencies": {
     "dotenv": "^4.0.0",
