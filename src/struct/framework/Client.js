@@ -1,6 +1,6 @@
-const BootBot = require('bootbot')
 const fs = require('fs')
 const path = require('path')
+const BootBot = require('bootbot')
 const Collection = require('./Collection')
 
 class Client extends BootBot {
@@ -21,7 +21,7 @@ class Client extends BootBot {
   init() {
     const arr = [
       [this.commandDir, this.commands],
-      [this.postbackDir, this.loadPostbacks],
+      [this.postbackDir, this.postbacks],
       [this.convoDir, this.convos]
     ]
 

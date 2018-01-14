@@ -1,5 +1,5 @@
 require('dotenv').config()
-const Client = require('./struct/Client')
+const Client = require('./struct/framework/Client')
 
 const client = new Client(
   {
@@ -8,7 +8,8 @@ const client = new Client(
     appSecret: process.env.APP_SECRET
   },
   {
-    commandDir: './src/commands'
+    commandDir: './src/commands',
+    postbackDir: './src/postbacks'
   }
 )
 

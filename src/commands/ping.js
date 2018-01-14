@@ -1,4 +1,4 @@
-const Command = require('../struct/Command')
+const Command = require('../struct/framework/Command')
 
 class PingCommand extends Command {
   constructor(client) {
@@ -8,8 +8,11 @@ class PingCommand extends Command {
     })
   }
 
-  exec(payload, chat) {
-    chat.say('pong!')
+  async exec(payload, chat) {
+    chat.say({
+      text: 'What do you need help with?',
+      buttons: [{ type: 'postback', title: 'test', payload: 'TEST' }]
+    })
   }
 }
 
