@@ -9,10 +9,14 @@ class PingCommand extends Command {
   }
 
   async exec(payload, chat) {
-    chat.say({
-      text: 'What do you need help with?',
-      buttons: [{ type: 'postback', title: 'test', payload: 'TEST' }]
+    const age = await chat.ask('How old are you?', {
+      validate(response) {
+        return !isNaN(response)
+      },
+      parse: Number
     })
+
+    chat.say(`So you are ${age} years old.`)
   }
 }
 

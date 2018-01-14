@@ -19,6 +19,35 @@ class Chat extends BootChat {
       this.bot.on('message', listener)
     })
   }
+
+  ask(question, opts) {
+    const { fallback, retries, parse, validate } = {
+      fallback: 'Couldn\'t get that. Come again?',
+      retries: 3,
+      validate: () => true,
+      parse: res => res,
+      ...opts
+    }
+
+    return new Promise(async (resolve, reject) => {
+      let res
+
+      for (let i = 0; i < retries; i++) {
+        try {
+          res = await this.prompt(question)
+        } catch (err) {
+          return reject('NO_RESPONSE')
+        }
+
+        if (res && validate(res)) return resolve(parse(res))
+        await this.say(fallback)
+      }
+    })
+  }
+
+  prompt(question) {
+    return this.say(question).then(() => this.awaitMessage())
+  }
 }
 
 module.exports = Chat

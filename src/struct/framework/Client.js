@@ -4,16 +4,14 @@ const BootBot = require('bootbot')
 const Collection = require('./Collection')
 
 class Client extends BootBot {
-  constructor(keys, { commandDir, postbackDir, convoDir }) {
+  constructor(keys, { commandDir, postbackDir }) {
     super(keys)
 
     this.commandDir = commandDir
     this.postbackDir = postbackDir
-    this.convoDir = convoDir
 
     this.commands = new Collection()
     this.postbacks = new Collection()
-    this.convos = new Collection()
 
     this.init()
   }
@@ -21,8 +19,7 @@ class Client extends BootBot {
   init() {
     const arr = [
       [this.commandDir, this.commands],
-      [this.postbackDir, this.postbacks],
-      [this.convoDir, this.convos]
+      [this.postbackDir, this.postbacks]
     ]
 
     for (const [dir, coll] of arr) {
