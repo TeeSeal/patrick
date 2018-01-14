@@ -1,0 +1,20 @@
+{
+  "name": "patrick",
+  "version": "0.0.0",
+  "description": "Course work",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node ./node_modules/nodemon/bin/nodemon.js src/index.js"
+  },
+  "repository": "https://github.com/TeeSeal/patrick.git",
+  "author": "TeeSeal <teesealz@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bootbot": "^1.0.14"
+  },
+  "devDependencies": {
+    "dotenv": "^4.0.0",
+    "eslint": "^4.15.0",
+    "nodemon": "^1.14.11"
+  }
+}
