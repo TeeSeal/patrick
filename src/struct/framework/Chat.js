@@ -5,24 +5,40 @@ class Chat extends BootChat {
     super(chat.bot, chat.userId)
   }
 
-  awaitMessage(time = 3e4) {
+  awaitMessage(time = 6e4) {
     return new Promise((resolve, reject) => {
       setTimeout(() => reject('time'), time)
 
-      const listener = payload => {
+      this.bot.once('message', (payload, ...args) => {
         if (this.userId && payload.sender.id !== this.userId) return
+        return resolve({ content: payload.message.text, payload, ...args })
+      })
+    })
+  }
 
-        this.bot.removeListener('message', listener)
-        return resolve(payload.message.text)
-      }
+  buttonConfirm(text, buttons, time = 6e4) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => reject('time'), time)
 
-      this.bot.on('message', listener)
+      this.say({
+        text,
+        buttons: buttons.map(btn => {
+          return {
+            type: 'postback',
+            title: btn,
+            payload: btn,
+          }
+        }),
+      }).then(() => {
+        this.bot.once('postback', ({ postback }) => resolve(postback.payload))
+      })
     })
   }
 
   ask(question, opts) {
-    const { fallback, retries, parse, validate } = {
+    const { fallback, retries, parse, validate, confirm } = {
       fallback: 'Couldn\'t get that. Come again?',
+      confirm: 'Please confirm.',
       retries: 3,
       validate: () => true,
       parse: res => res,
@@ -30,16 +46,28 @@ class Chat extends BootChat {
     }
 
     return new Promise(async (resolve, reject) => {
-      let res
+      let msg
 
       for (let i = 0; i < retries; i++) {
         try {
-          res = await this.prompt(question)
+          msg = await this.prompt(question)
         } catch (err) {
           return reject('NO_RESPONSE')
         }
 
-        if (res && validate(res)) return resolve(parse(res))
+        let res = msg.content
+        if (res && validate(res)) {
+          res = parse(res)
+
+          if (Array.isArray(res)) {
+            res = await this.prompt({
+              text: confirm,
+              quickReplies: res.map(thing => thing.toString()),
+            }).then(({ content }) => content)
+          }
+
+          return resolve({ ...msg, res: res })
+        }
         await this.say(fallback)
       }
     })

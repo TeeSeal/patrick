@@ -4,16 +4,20 @@ class PingCommand extends Command {
   constructor(client) {
     super(client, {
       id: 'ping',
-      aliases: ['Ping']
+      aliases: ['Ping'],
     })
   }
 
   async exec(payload, chat) {
-    const age = await chat.ask('How old are you?', {
+    const { res: age } = await chat.ask('How old are you?', {
       validate(response) {
-        return !isNaN(response)
+        return /\d/.test(response)
       },
-      parse: Number
+      parse(response) {
+        const matches = response.match(/\d+/g).map(Number)
+        if (matches.length === 1) return matches[0]
+        return matches
+      },
     })
 
     chat.say(`So you are ${age} years old.`)
