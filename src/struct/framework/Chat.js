@@ -26,7 +26,7 @@ class Chat extends BootChat {
       retries: 3,
       validate: () => true,
       parse: res => res,
-      ...opts
+      ...opts,
     }
 
     return new Promise(async (resolve, reject) => {

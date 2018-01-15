@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const BootBot = require('bootbot')
-const Collection = require('./Collection')
+const Collection = require('../Collection')
 
 class Client extends BootBot {
   constructor(keys, { commandDir, postbackDir }) {
@@ -19,7 +19,7 @@ class Client extends BootBot {
   init() {
     const arr = [
       [this.commandDir, this.commands],
-      [this.postbackDir, this.postbacks]
+      [this.postbackDir, this.postbacks],
     ]
 
     for (const [dir, coll] of arr) {

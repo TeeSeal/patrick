@@ -10,7 +10,9 @@
   "author": "TeeSeal <teesealz@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "bootbot": "github:teeseal/bootbot#master"
+    "bootbot": "github:teeseal/bootbot#master",
+    "sequelize": "^4.31.2",
+    "sqlite3": "^3.1.13"
   },
   "devDependencies": {
     "dotenv": "^4.0.0",
