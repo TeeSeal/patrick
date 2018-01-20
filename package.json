@@ -12,6 +12,7 @@
   "dependencies": {
     "bootbot": "github:teeseal/bootbot#master",
     "exceljs": "^0.8.2",
+    "moment": "^2.20.1",
     "sequelize": "^4.31.2",
     "sqlite3": "^3.1.13"
   },

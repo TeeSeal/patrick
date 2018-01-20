@@ -1,35 +1,37 @@
 const SpreadSheet = require('../spreadsheet/SpreadSheet')
 const Lecture = require('./Lecture')
+const moment = require('moment')
+
 const WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
 const timeTable = [
   {
-    from : '8:00',
-    to: '9:30'
+    start: '8:00',
+    end: '9:30',
   },
   {
-    from : '9:45',
-    to: '11:15'
+    start: '9:45',
+    end: '11:15',
   },
   {
-    from : '11:30',
-    to: '13:00'
+    start: '11:30',
+    end: '13:00',
   },
   {
-    from : '13:30',
-    to: '15:00'
+    start: '13:30',
+    end: '15:00',
   },
   {
-    from : '15:15',
-    to: '16:45'
+    start: '15:15',
+    end: '16:45',
   },
   {
-    from : '17:00',
-    to: '18:30'
+    start: '17:00',
+    end: '18:30',
   },
   {
-    from : '18:40',
-    to: '20:15'
-  }
+    start: '18:40',
+    end: '20:15',
+  },
 ]
 
 function paginate(arr, count) {
@@ -64,7 +66,7 @@ class Schedule extends SpreadSheet {
       .cells.map(c => c.value)
 
     for (const [idx, value] of values.entries()) {
-      if (/[A-Z]{1,3}-\d{3}/.test(value)) this.groupIndexes[value] = idx
+      if (/[A-Z]{1,4}-\d{3}/.test(value)) this.groupIndexes[value] = idx
     }
   }
 
@@ -92,6 +94,8 @@ class Schedule extends SpreadSheet {
 
   lecturesFor(group, day) {
     const { from, to } = this.dayIndexes[day]
+    if (!from) return null
+
     const colIndex = this.groupIndexes[group]
 
     const cells = this.rows
@@ -107,34 +111,73 @@ class Schedule extends SpreadSheet {
       .map((lecture, index) => {
         const textLines = lecture.filter(c => c)
         if (!textLines.length) return null
+        let data
 
         if (textLines.length === 1) {
-          return this.parseLongLecture(lectures[index - 1], lecture)
-        }
-        if (textLines.length === 2) {
-          return this.parseLongLecture(lecture, lectures[index + 1])
-        }
-        if (textLines.length === 6) {
-          return this.parseWeeklyLecture(lecture)
+          data = this.parseLongLecture(lectures[index - 1], lecture)
+        } else if (textLines.length === 2) {
+          data = this.parseLongLecture(lecture, lectures[index + 1])
+        } else if (textLines.length === 6) {
+          data = this.parseWeeklyLecture(lecture)
+        } else {
+          const [name, prof, cab] = textLines
+          data = { name, prof, cab: Number(cab) }
         }
 
-        const [name, prof, cab] = textLines
-        return new Lecture({ name, prof, cab: Number(cab) })
+        return new Lecture(data, timeTable[index])
       })
       .filter(l => l)
   }
 
   parseLongLecture(l1, l2) {
     const [name, prof, cab] = l1.concat(l2).filter(c => c)
-    return new Lecture({ name, prof, cab: Number(cab) })
+    return { name, prof, cab: Number(cab) }
   }
 
   parseWeeklyLecture(cells) {
     const [n1, p1, c1, n2, p2, c2] = cells
-    return new Lecture([
+    return [
       { name: n1, prof: p1, cab: Number(c1) },
       { name: n2, prof: p2, cab: Number(c2) },
-    ])
+    ]
+  }
+
+  currentLectureFor(group, time) {
+    const currentTime = time || moment()
+    const lectures = this.lecturesFor(
+      group,
+      currentTime.formad('dddd').toLowerCase()
+    )
+
+    if (!lectures) return null
+
+    return lectures.find(({ start, end }) => {
+      const startTime = Schedule.todayAt(start)
+      const endTime = Schedule.todayAt(end)
+
+      return currentTime > startTime && currentTime < endTime
+    })
+  }
+
+  nextLectureFor(group, time) {
+    const currentTime = time || moment()
+    const lectures = this.lecturesFor(
+      group,
+      currentTime.format('dddd').toLowerCase()
+    )
+
+    if (!lectures) return null
+
+    return lectures.find(({ start }) => {
+      const startTime = Schedule.todayAt(start)
+      return currentTime < startTime
+    })
+  }
+
+  static todayAt(time) {
+    return moment(
+      moment().startOf('day') + moment.duration(time).asMilliseconds()
+    )
   }
 }
 
