@@ -66,7 +66,7 @@ class Chat extends BootChat {
             }).then(({ content }) => content)
           }
 
-          return resolve({ ...msg, res: res })
+          return resolve({ ...msg, res })
         }
         await this.say(fallback)
       }
