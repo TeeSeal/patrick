@@ -1,6 +1,36 @@
 const SpreadSheet = require('../spreadsheet/SpreadSheet')
 const Lecture = require('./Lecture')
 const WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+const timeTable = [
+  {
+    from : '8:00',
+    to: '9:30'
+  },
+  {
+    from : '9:45',
+    to: '11:15'
+  },
+  {
+    from : '11:30',
+    to: '13:00'
+  },
+  {
+    from : '13:30',
+    to: '15:00'
+  },
+  {
+    from : '15:15',
+    to: '16:45'
+  },
+  {
+    from : '17:00',
+    to: '18:30'
+  },
+  {
+    from : '18:40',
+    to: '20:15'
+  }
+]
 
 function paginate(arr, count) {
   return arr
