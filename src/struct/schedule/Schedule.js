@@ -1,47 +1,8 @@
 const SpreadSheet = require('../spreadsheet/SpreadSheet')
-const Lecture = require('./Lecture')
 const moment = require('moment')
+const LectureParser = require('./LectureParser')
 
 const WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
-const timeTable = [
-  {
-    start: '8:00',
-    end: '9:30',
-  },
-  {
-    start: '9:45',
-    end: '11:15',
-  },
-  {
-    start: '11:30',
-    end: '13:00',
-  },
-  {
-    start: '13:30',
-    end: '15:00',
-  },
-  {
-    start: '15:15',
-    end: '16:45',
-  },
-  {
-    start: '17:00',
-    end: '18:30',
-  },
-  {
-    start: '18:40',
-    end: '20:15',
-  },
-]
-
-function paginate(arr, count) {
-  return arr
-    .map((item, index) => {
-      if (index % count !== 0) return null
-      return arr.slice(index, index + count)
-    })
-    .filter(page => page)
-}
 
 class Schedule extends SpreadSheet {
   constructor(path) {
@@ -102,7 +63,7 @@ class Schedule extends SpreadSheet {
       .slice(from, to)
       .map(row => row.cells[colIndex].value)
 
-    return this.parseLectures(cells)
+    return LectureParser.parseLectures(cells)
   }
 
   currentLectureFor(group, time) {
