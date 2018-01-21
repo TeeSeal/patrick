@@ -105,43 +105,6 @@ class Schedule extends SpreadSheet {
     return this.parseLectures(cells)
   }
 
-  parseLectures(cells) {
-    const lectures = paginate(cells, 6)
-    return lectures
-      .map((lecture, index) => {
-        const textLines = lecture.filter(c => c)
-        if (!textLines.length) return null
-        let data
-
-        if (textLines.length === 1) {
-          data = this.parseLongLecture(lectures[index - 1], lecture)
-        } else if (textLines.length === 2) {
-          data = this.parseLongLecture(lecture, lectures[index + 1])
-        } else if (textLines.length === 6) {
-          data = this.parseWeeklyLecture(lecture)
-        } else {
-          const [name, prof, cab] = textLines
-          data = { name, prof, cab: Number(cab) }
-        }
-
-        return new Lecture(data, timeTable[index])
-      })
-      .filter(l => l)
-  }
-
-  parseLongLecture(l1, l2) {
-    const [name, prof, cab] = l1.concat(l2).filter(c => c)
-    return { name, prof, cab: Number(cab) }
-  }
-
-  parseWeeklyLecture(cells) {
-    const [n1, p1, c1, n2, p2, c2] = cells
-    return [
-      { name: n1, prof: p1, cab: Number(c1) },
-      { name: n2, prof: p2, cab: Number(c2) },
-    ]
-  }
-
   currentLectureFor(group, time) {
     const currentTime = time || moment()
     const lectures = this.lecturesFor(
