@@ -46,45 +46,44 @@ class LectureParser {
   static parseLectures(cells) {
     const lectures = paginate(cells, 6)
     let longFlag = false
-    return lectures
-      .map((lecture, index) => {
-        const textLines = lecture.filter(c => c)
-        if (!textLines.length) return null
-        const roomCells = textLines.filter(text => ROOM_REGEXP.test(text))
+    return lectures.map((lecture, index) => {
+      const textLines = lecture.filter(c => c)
+      if (!textLines.length) return null
+      const roomCells = textLines.filter(text => ROOM_REGEXP.test(text))
 
-        let data
-        const first3 = lecture.slice(0, 3)
-        const last3 = lecture.slice(3, 6)
-        const firstRoomCells = first3.filter(text => ROOM_REGEXP.test(text))
-        const lastRommCells = last3.filter(text => ROOM_REGEXP.test(text))
+      let data
+      const first3 = lecture.slice(0, 3)
+      const last3 = lecture.slice(3, 6)
+      const firstRoomCells = first3.filter(text => ROOM_REGEXP.test(text))
+      const lastRommCells = last3.filter(text => ROOM_REGEXP.test(text))
 
-        const isWeekly =
-          textLines.length == 6 ||
-          (first3.every(l => l) && firstRoomCells.length === 1) ||
-          (last3.every(l => l) && lastRommCells.length === 1)
+      const isWeekly =
+        textLines.length == 6 ||
+        (first3.every(l => l) && firstRoomCells.length === 1) ||
+        (last3.every(l => l) && lastRommCells.length === 1)
 
-        const isLong = roomCells.length === 0
-        if (longFlag) {
-          data = LectureParser.parseLongLecture(lectures[index - 1], lecture)
-          longFlag = false
-        } else if (isWeekly) {
-          data = LectureParser.parseWeeklyLecture(textLines)
-        } else if (isLong) {
-          data = LectureParser.parseLongLecture(lecture, lectures[index + 1])
-          longFlag = true
-        } else {
-          data = LectureParser.parseLecture(lecture)
-        }
+      const isLong = roomCells.length === 0
+      if (longFlag) {
+        data = LectureParser.parseLongLecture(lectures[index - 1], lecture)
+        longFlag = false
+      } else if (isWeekly) {
+        data = LectureParser.parseWeeklyLecture(textLines)
+      } else if (isLong) {
+        data = LectureParser.parseLongLecture(lecture, lectures[index + 1])
+        longFlag = true
+      } else {
+        data = LectureParser.parseLecture(lecture)
+      }
 
-        return new Lecture(data, timeTable[index])
-      })
-      .filter(l => l)
+      return new Lecture(data, timeTable[index])
+    })
   }
 
   static parseLecture(lines) {
     const nameLines = []
     const profRoomLines = lines.filter(line => {
       if (!line) return false
+      line = line.toString()
       if (line.match(ROOM_REGEXP) || line.match(PROF_REGEXP)) return true
       nameLines.push(line)
       return false

@@ -16,6 +16,7 @@ class IntroCommand extends Command {
         return response.split(' ').length === 1
       },
     })
+
     const { res: lastName } = await chat.ask('Okay, what is your last name?', {
       fallback: 'Just your last name please.',
       validate(response) {
@@ -23,32 +24,20 @@ class IntroCommand extends Command {
       },
     })
 
-    const { res: age } = await chat.ask('Very well. How old are you?', {
-      fallback: 'Please tell me a number.',
-      validate(response) {
-        return /\d/.test(response)
-      },
-      parse(response) {
-        const matches = response.match(/\d+/g).map(Number)
-        if (matches.length === 1) return matches[0]
-        return matches
-      },
-    })
-
     const { res: group } = await chat.ask(
       'Alright. And finally, in what group are you currently?',
       {
         validate(response) {
-          return /\w{2,3}-\d{3}/.test(response.toUpperCase())
+          return /\w{1,4}-\d{3}/.test(response.toUpperCase())
         },
         parse(response) {
-          return response.match(/\w{2,3}-\d{3}/)[0].toUpperCase()
+          return response.match(/\w{1,4}-\d{3}/)[0].toUpperCase()
         },
       }
     )
 
     chat.say('Okay, all written down!')
-    User.create({ firstName, lastName, age, group })
+    User.create({ id: payload.sender.id, firstName, lastName, group })
   }
 }
 

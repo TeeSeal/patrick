@@ -2,7 +2,7 @@ require('dotenv').config()
 const Client = require('./struct/framework/Client')
 const { sequelize } = require('./db')
 
-sequelize.sync({ force: true }).then(() => {
+sequelize.sync().then(() => {
   new Client(
     {
       accessToken: process.env.ACCESS_TOKEN,
