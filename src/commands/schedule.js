@@ -9,14 +9,17 @@ class ScheduleCommand extends Command {
   constructor(client) {
     super(client, {
       id: 'schedule',
-      aliases: [/lecture|course|lesson|pair/],
+      aliases: [/lecture|course|lesson|pair|have/],
     })
   }
 
   async exec(payload, chat) {
     if (/now$|next$/.test(payload.message.text)) return
+
     const user = await User.findById(payload.sender.id)
-    const group = payload.message.text.match(/\w{1,4}-\d{3}/)[0] || user.group
+    const match = payload.message.text.match(/\w{1,4}-\d{3}/)
+    const group = (match && match[0]) || (user && user.group)
+
     if (!group) {
       return chat.say(
         'I don\'t know what group you\'re from. Please type "intro".'
@@ -27,18 +30,28 @@ class ScheduleCommand extends Command {
     if (!parsed) return chat.say('Sorry, couldn\'t get that.')
 
     const year = parseYear(group)
-    const schdl = await new Schedule(
-      `./assets/schedules/year${year}.xlsx`
-    ).init()
 
+    if (year < 1 || year > 4) {
+      return chat.say('That group doesn\'t exist.')
+    }
+
+    const schdl = await Schedule.fetch(year)
     const time = moment(parsed)
-    const parity = getWeekParity(time)
-    const lectures = schdl
-      .lecturesFor(group, time.format('dddd').toLowerCase())
-      .map(l => l[parity])
-      .filter(l => l)
+    const lectures = schdl.lecturesFor(group, time.format('dddd').toLowerCase())
 
-    for (const lecture of lectures) {
+    if (lectures === 'invalid_weekday') {
+      return chat.say('That is not a valid weekday.')
+    }
+
+    if (lectures === 'invalid_group') {
+      return match
+        ? chat.say('Couldn\'t find that group.')
+        : chat.say('Couldn\'t find your group. Try doing "intro" again.')
+    }
+
+    const transformed = lectures.map(l => l[getWeekParity(time)]).filter(l => l)
+
+    for (const lecture of transformed) {
       await chat.say(
         `${lecture.start} - ${lecture.end} | ${lecture.name} with ${
           lecture.prof

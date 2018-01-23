@@ -37,7 +37,7 @@ class IntroCommand extends Command {
     )
 
     chat.say('Okay, all written down!')
-    User.create({ id: payload.sender.id, firstName, lastName, group })
+    User.upsert({ id: payload.sender.id, firstName, lastName, group })
   }
 }
 

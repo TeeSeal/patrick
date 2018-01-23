@@ -3,6 +3,7 @@ const moment = require('moment')
 const LectureParser = require('./LectureParser')
 
 const WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+const schedules = new Map()
 
 class Schedule extends SpreadSheet {
   constructor(path) {
@@ -54,10 +55,12 @@ class Schedule extends SpreadSheet {
   }
 
   lecturesFor(group, day) {
-    const { from, to } = this.dayIndexes[day]
-    if (!from) return null
+    const times = this.dayIndexes[day]
+    if (!times) return 'invalid_weekday'
+    const { from, to } = times
 
     const colIndex = this.groupIndexes[group]
+    if (!colIndex) return 'invalid_group'
 
     const cells = this.rows
       .slice(from, to)
@@ -102,6 +105,15 @@ class Schedule extends SpreadSheet {
     return moment(
       moment().startOf('day') + moment.duration(time).asMilliseconds()
     )
+  }
+
+  static async fetch(path) {
+    if (!isNaN(path)) path = `./assets/schedules/year${path}.xlsx`
+    if (schedules.has(path)) return schedules.get(path)
+
+    const instance = new Schedule(path).init()
+    schedules.set(path, instance)
+    return instance
   }
 }
 
