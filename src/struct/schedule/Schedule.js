@@ -1,6 +1,7 @@
 const SpreadSheet = require('../spreadsheet/SpreadSheet')
 const moment = require('moment')
 const LectureParser = require('./LectureParser')
+const { todayAt, getWeekParity } = require('../../util')
 
 const WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
 const schedules = new Map()
@@ -69,42 +70,34 @@ class Schedule extends SpreadSheet {
     return LectureParser.parseLectures(cells)
   }
 
-  currentLectureFor(group, time) {
-    const currentTime = time || moment()
-    const lectures = this.lecturesFor(
-      group,
-      currentTime.formad('dddd').toLowerCase()
-    )
+  lectureAt(group, time) {
+    if (!time) time = moment()
+    const lectures = this.lecturesFor(group, time.format('dddd').toLowerCase())
+    if (lectures instanceof String) return lectures
 
-    if (!lectures) return null
+    const parity = getWeekParity(time)
+    const mapped = lectures.map(l => l[parity])
 
-    return lectures.find(({ start, end }) => {
-      const startTime = Schedule.todayAt(start)
-      const endTime = Schedule.todayAt(end)
+    return mapped.find(({ start, end }) => {
+      const startTime = todayAt(start)
+      const endTime = todayAt(end)
 
-      return currentTime > startTime && currentTime < endTime
+      return time >= startTime && time <= endTime
     })
   }
 
   nextLectureFor(group, time) {
-    const currentTime = time || moment()
-    const lectures = this.lecturesFor(
-      group,
-      currentTime.format('dddd').toLowerCase()
-    )
+    if (!time) time = moment()
+    const lectures = this.lecturesFor(group, time.format('dddd').toLowerCase())
+    if (lectures instanceof String) return lectures
 
-    if (!lectures) return null
+    const parity = getWeekParity(time)
+    const mapped = lectures.map(l => l[parity])
 
-    return lectures.find(({ start }) => {
-      const startTime = Schedule.todayAt(start)
-      return currentTime < startTime
+    return mapped.find(({ start }) => {
+      const startTime = todayAt(start)
+      return time < startTime
     })
-  }
-
-  static todayAt(time) {
-    return moment(
-      moment().startOf('day') + moment.duration(time).asMilliseconds()
-    )
   }
 
   static async fetch(path) {

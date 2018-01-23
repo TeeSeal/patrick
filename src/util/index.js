@@ -12,7 +12,7 @@ class Util {
 
   static getAcademicYear(time = moment()) {
     time = moment(time)
-    return time.subtract(8, 'months').year()
+    return time.subtract(9, 'months').year()
   }
 
   static getWeekParity(time = moment()) {
@@ -22,6 +22,12 @@ class Util {
     const weeks = dif.week()
 
     return weeks % 2 ? 'odd' : 'even'
+  }
+
+  static todayAt(time) {
+    return moment(
+      moment().startOf('day') + moment.duration(time).asMilliseconds()
+    )
   }
 }
 
